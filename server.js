@@ -9,7 +9,7 @@ var nicknames = {};
 
 io.on('connection', function (socket) {
     socket.on('nickname was input', function (nickname) {
-        if (nickname in nicknames) {
+        if (!nickname || nickname in nicknames) {
             socket.emit('nickname rejected', nickname);
         } else {
             nicknames[nickname] = null;
