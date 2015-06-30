@@ -8,19 +8,46 @@ app.use('/', express.static('public'));
 var nicknames = {};
 
 io.on('connection', function (socket) {
+    console.log('connection', socket.nickname);
+
     socket.on('nickname was input', function (nickname) {
-        if (!nickname || nickname in nicknames) {
-            socket.emit('nickname rejected', nickname);
-        } else {
-            nicknames[nickname] = null;
-            socket.nickname = nickname;
-            socket.broadcast.emit('user joined', nickname);
+        tryToRememberSocketNickname(socket, nickname);
+    });
+
+    socket.on('disconnect', function () {
+        console.log('client disconnected', socket.nickname);
+        if (socket.nickname) {
+            delete nicknames[socket.nickname];
         }
     });
+
+    socket.emit('nickname was asked');
 });
 
-io.on('disconnect', function (socket) {
-    if (socket.nickname) {
-        delete nicknames[socket.nickname];
+function validateNickname(nickname) {
+    var passed = true;
+
+    if (!nickname || nickname in nicknames) {
+        passed = false;
     }
-});
+
+    return passed;
+}
+
+function tryToRememberSocketNickname(socket, nickname) {
+    if (validateNickname(nickname)) {
+        rememberSocketNickname(socket, nickname);
+        socket.emit('nickname accepted', nickname);
+        console.log('nickname', nickname, 'was accepted');
+    } else {
+        socket.emit('nickname rejected', nickname);
+        console.log('nickname', nickname, 'was rejected');
+    }
+}
+
+function rememberSocketNickname(socket, nickname) {
+    nicknames[nickname] = null;
+    socket.nickname = nickname;
+    socket.broadcast.emit('user joined', nickname);
+    console.log(nickname, 'connected');
+}
