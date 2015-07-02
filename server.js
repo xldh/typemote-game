@@ -22,6 +22,7 @@ io.on('connection', function (socket) {
         }
     });
 
+    makeSocketAwareOfOthers(socket);
     socket.emit('nickname was asked');
 });
 
@@ -35,6 +36,7 @@ function validateNickname(nickname) {
     return passed;
 }
 
+
 function tryToRememberSocketNickname(socket, nickname) {
     if (validateNickname(nickname)) {
         rememberSocketNickname(socket, nickname);
@@ -46,8 +48,16 @@ function tryToRememberSocketNickname(socket, nickname) {
     }
 }
 
+
 function rememberSocketNickname(socket, nickname) {
     nicknames[nickname] = null;
     socket.nickname = nickname;
     console.log(nickname, 'registered');
+}
+
+
+function makeSocketAwareOfOthers(socket) {
+    for (var nickname in nicknames) {
+        socket.emit('user joined', nickname);
+    }
 }
