@@ -16,6 +16,7 @@ io.on('connection', function (socket) {
 
     socket.on('disconnect', function () {
         console.log('client disconnected');
+        socket.broadcast.emit('user left', socket.nickname || 'anonymous');
         if (socket.nickname) {
             delete nicknames[socket.nickname];
         }

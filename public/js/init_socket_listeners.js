@@ -27,6 +27,10 @@ module.exports = function (socket) {
       networkLogger.consume({ message: 'user ' + nickname + ' joined' });
    });
 
+   socket.on('user left', function (nickname) {
+       networkLogger.consume({ message: 'user ' + nickname + ' left' });
+   });
+
    socket.on('disconnect', function () {
        networkLogger.consume({ message: 'client disconnected' });
    });
