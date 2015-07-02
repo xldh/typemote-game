@@ -1,37 +1,15 @@
-var inputNickname = require('./input_nickname');
 var networkLogger = require('./network_logger');
+var addNicknameActions = require('./listeners_actions/nickname');
+var addNicknameLogs = require('./listeners_reports/nickname');
+var addUsersLogs = require('./listeners_reports/users');
+var addOwnClientLogs = require('./listeners_reports/own_client');
 
 module.exports = function (socket) {
-   socket.on('nickname was asked', function () {
-        networkLogger.consume({ message: 'nickname was asked' });
-        if (socket.nickname) {
-            socket.emit('nickname was input', socket.nickname);
-        } else {
-            inputNickname(socket);
-        }
-   });
+    // actions
+    addNicknameActions(socket);
 
-   socket.on('nickname rejected', function (duplicateNickname) {
-       networkLogger.consume({ message: 'nickname ' + duplicateNickname + ' was rejected'});
-       delete socket.nickname;
-       inputNickname(socket, duplicateNickname);
-   });
-
-   socket.on('nickname accepted', function (nickname) {
-       console.log('nickname accepted', nickname);
-       networkLogger.consume({ message: 'nickname ' + nickname + ' accepted' });
-       socket.nickname = nickname;
-   });
-
-   socket.on('user joined', function (nickname) {
-      networkLogger.consume({ message: 'user ' + nickname + ' joined' });
-   });
-
-   socket.on('user left', function (nickname) {
-       networkLogger.consume({ message: 'user ' + nickname + ' left' });
-   });
-
-   socket.on('disconnect', function () {
-       networkLogger.consume({ message: 'client disconnected' });
-   });
+    // logs
+    addNicknameLogs(socket, networkLogger);
+    addUsersLogs(socket, networkLogger);
+    addOwnClientLogs(socket, networkLogger);
 };
