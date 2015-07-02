@@ -69,65 +69,32 @@
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var inputNickname = __webpack_require__(3);
-	var networkLogger = __webpack_require__(4);
+	var networkLogger = __webpack_require__(3);
+	var addNicknameActions = __webpack_require__(5);
+	var addNicknameLogs = __webpack_require__(7);
+	var addUsersLogs = __webpack_require__(8);
+	var addOwnClientLogs = __webpack_require__(9);
 
 	module.exports = function (socket) {
-	   socket.on('nickname was asked', function () {
-	        networkLogger.consume({ message: 'nickname was asked' });
-	        if (socket.nickname) {
-	            socket.emit('nickname was input', socket.nickname);
-	        } else {
-	            inputNickname(socket);
-	        }
-	   });
+	    // actions
+	    addNicknameActions(socket);
 
-	   socket.on('nickname rejected', function (duplicateNickname) {
-	       networkLogger.consume({ message: 'nickname ' + duplicateNickname + ' was rejected'});
-	       delete socket.nickname;
-	       inputNickname(socket, duplicateNickname);
-	   });
-
-	   socket.on('nickname accepted', function (nickname) {
-	       console.log('nickname accepted', nickname);
-	       networkLogger.consume({ message: 'nickname ' + nickname + ' accepted' });
-	       socket.nickname = nickname;
-	   });
-
-	   socket.on('user joined', function (nickname) {
-	      networkLogger.consume({ message: 'user ' + nickname + ' joined' });
-	   });
-
-	   socket.on('disconnect', function () {
-	       networkLogger.consume({ message: 'client disconnected' });
-	   });
+	    // logs
+	    addNicknameLogs(socket, networkLogger);
+	    addUsersLogs(socket, networkLogger);
+	    addOwnClientLogs(socket, networkLogger);
 	};
 
 /***/ },
 /* 3 */
-/***/ function(module, exports) {
-
-	module.exports = function (socket, duplicateNickname) {
-	    var message = 'Enter a nickname';
-
-	    if (duplicateNickname) {
-	        message += ' (' + duplicateNickname + ' is already taken)';
-	    }
-
-	    var nickname = prompt(message);
-	    socket.emit('nickname was input', nickname);
-	};
-
-/***/ },
-/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Logger = __webpack_require__(5);
+	var Logger = __webpack_require__(4);
 
 	module.exports = new Logger();
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports) {
 
 	function Logger(displayer) {
@@ -183,6 +150,96 @@
 	};
 
 	module.exports = Logger;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var inputNickname = __webpack_require__(6);
+
+	function addNicknameActions(socket) {
+	    socket.on('nickname was asked', function () {
+	        if (socket.nickname) {
+	            socket.emit('nickname was input', socket.nickname);
+	        } else {
+	            inputNickname(socket);
+	        }
+	    });
+
+	    socket.on('nickname rejected', function (duplicateNickname) {
+	       delete socket.nickname;
+	       inputNickname(socket, duplicateNickname);
+	    });
+
+	    socket.on('nickname accepted', function (nickname) {
+	       socket.nickname = nickname;
+	    });
+	}
+
+	module.exports = addNicknameActions;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	module.exports = function (socket, duplicateNickname) {
+	    var message = 'Enter a nickname';
+
+	    if (duplicateNickname) {
+	        message += ' (' + duplicateNickname + ' is already taken)';
+	    }
+
+	    var nickname = prompt(message);
+	    socket.emit('nickname was input', nickname);
+	};
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	function addNicknameLogs(socket, logger) {
+	    socket.on('nickname was asked', function () {
+	        logger.consume({ message: 'nickname was asked' });
+	    });
+
+	    socket.on('nickname rejected', function (duplicateNickname) {
+	       logger.consume({ message: 'nickname ' + duplicateNickname + ' was rejected'});
+	    });
+
+	    socket.on('nickname accepted', function (nickname) {
+	       logger.consume({ message: 'nickname ' + nickname + ' accepted' });
+	    });
+	}
+
+	module.exports = addNicknameLogs;
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	function addUsersLogs(socket, logger) {
+	   socket.on('user joined', function (nickname) {
+	      logger.consume({ message: 'user ' + nickname + ' joined' });
+	   });
+
+	   socket.on('user left', function (nickname) {
+	       logger.consume({ message: 'user ' + nickname + ' left' });
+	   });
+	}
+
+	module.exports = addUsersLogs;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	function addOwnClientLogs(socket, logger) {
+	   socket.on('disconnect', function () {
+	       logger.consume({ message: 'client disconnected' });
+	   });
+	}
+
+	module.exports = addOwnClientLogs;
 
 /***/ }
 /******/ ]);
