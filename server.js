@@ -8,14 +8,14 @@ app.use('/', express.static('public'));
 var nicknames = {};
 
 io.on('connection', function (socket) {
-    console.log('connection', socket.nickname);
+    console.log('connection');
 
     socket.on('nickname was input', function (nickname) {
         tryToRememberSocketNickname(socket, nickname);
     });
 
     socket.on('disconnect', function () {
-        console.log('client disconnected', socket.nickname);
+        console.log('client disconnected');
         if (socket.nickname) {
             delete nicknames[socket.nickname];
         }
@@ -38,16 +38,15 @@ function tryToRememberSocketNickname(socket, nickname) {
     if (validateNickname(nickname)) {
         rememberSocketNickname(socket, nickname);
         socket.emit('nickname accepted', nickname);
-        console.log('nickname', nickname, 'was accepted');
+        socket.broadcast.emit('user joined', nickname);
     } else {
-        socket.emit('nickname rejected', nickname);
         console.log('nickname', nickname, 'was rejected');
+        socket.emit('nickname rejected', nickname);
     }
 }
 
 function rememberSocketNickname(socket, nickname) {
     nicknames[nickname] = null;
     socket.nickname = nickname;
-    socket.broadcast.emit('user joined', nickname);
-    console.log(nickname, 'connected');
+    console.log(nickname, 'registered');
 }
