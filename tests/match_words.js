@@ -8,7 +8,8 @@ describe('matchWords(first, second)', function () {
         var expected = {
             maxRatio: 1,
             ratio: 1,
-            ratioToMax: 1
+            ratioToMax: 1,
+            diffIndices: []
         };
 
         assert.deepEqual(matchWords(first, second), expected);
@@ -20,7 +21,8 @@ describe('matchWords(first, second)', function () {
         var expected = {
             maxRatio: 0.75,
             ratio: 0.75,
-            ratioToMax: 1
+            ratioToMax: 1,
+            diffIndices: []
         };
 
         assert.deepEqual(matchWords(first, second), expected);

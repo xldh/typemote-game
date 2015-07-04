@@ -9,10 +9,13 @@ function matchWords(first, second) {
 
     var maxRatio = 1 / (second.length / first.length);
     var matchingCharCount = 0;
+    var diffIndices = [];
 
     first.split('').map(function (char, index) {
         if (char === second.charAt(index)) {
             matchingCharCount++;
+        } else {
+            diffIndices.push(index);
         }
     });
 
@@ -21,7 +24,8 @@ function matchWords(first, second) {
     return {
         maxRatio: maxRatio,
         ratio: ratio,
-        ratioToMax: ratio / maxRatio
+        ratioToMax: ratio / maxRatio,
+        diffIndices: diffIndices
     };
 }
 
