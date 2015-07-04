@@ -15,7 +15,7 @@ describe('matchWords(first, second)', function () {
         assert.deepEqual(matchWords(first, second), expected);
     });
 
-    it('should match partially', function () {
+    it('should match entirely according to maxRatio', function () {
         var first = 'tes';
         var second = 'test';
         var expected = {
@@ -26,6 +26,17 @@ describe('matchWords(first, second)', function () {
         };
 
         assert.deepEqual(matchWords(first, second), expected);
+    });
+
+    it('should have an accurate delta analysis', function () {
+        var first = 'toss';
+        var second = 'test';
+        var expectedDiffIndices = [1, 3];
+
+        assert.deepEqual(
+            matchWords(first, second).diffIndices,
+            expectedDiffIndices
+        );
     });
 
     describe('Error handling', function () {
