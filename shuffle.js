@@ -4,7 +4,7 @@ function shuffle(array, iterations) {
     var iteration;
     var l = array.length;
 
-    for (iteration = 0; iteration < iterations; iterations++) {
+    for (iteration = 0; iteration < iterations; iteration++) {
         for (var i = 0; i < l; i++) {
             var randomIndex = Math.random() * l | 0;
             var tmp = array[i];
