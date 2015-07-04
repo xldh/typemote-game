@@ -70,10 +70,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var networkLogger = __webpack_require__(3);
-	var addNicknameActions = __webpack_require__(5);
-	var addNicknameLogs = __webpack_require__(7);
-	var addUsersLogs = __webpack_require__(8);
-	var addOwnClientLogs = __webpack_require__(9);
+	var addNicknameActions = __webpack_require__(7);
+	var addNicknameLogs = __webpack_require__(9);
+	var addUsersLogs = __webpack_require__(10);
+	var addOwnClientLogs = __webpack_require__(11);
 
 	module.exports = function (socket) {
 	    // actions
@@ -95,7 +95,9 @@
 
 /***/ },
 /* 4 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
+
+	var LogHTMLDisplayer = __webpack_require__(5);
 
 	function Logger(displayer) {
 	    this.buffer = [];
@@ -121,6 +123,15 @@
 	    this.displayer.display(entry);
 	};
 
+
+	module.exports = Logger;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var simpleTemplate = __webpack_require__(6);
+
 	function LogHTMLDisplayer(params) {
 	    params = params || {};
 
@@ -134,28 +145,64 @@
 	        entries = [entries];
 	    }
 
-	    var templateHolder = document.body.querySelector(this.templateSelector);
-
 	    for (var i = 0, l = entries.length; i < l; i++) {
-	        templateHolder = templateHolder.cloneNode(true);
+	        var template = simpleTemplate(this.templateSelector);
+	        var messageHolder;
 
-	        this.container.insertAdjacentHTML('beforeend', templateHolder.innerHTML);
-
-	        var messageHolders = this.container.querySelectorAll('[data-contents]');
-	        var messageHolder = messageHolders[messageHolders.length - 1];
+	        if (template.hasAttribute('data-contents')) {
+	            messageHolder = template;
+	        } else {
+	            template = template.querySelector('[data-contents]');
+	        }
 
 	        messageHolder.textContent = entries[i].message;
 
+	        this.container.appendChild(template);
 	    }
 	};
 
-	module.exports = Logger;
+	module.exports = LogHTMLDisplayer;
 
 /***/ },
-/* 5 */
+/* 6 */
+/***/ function(module, exports) {
+
+	function simpleTemplate(templateSelector) {
+	    var element = document.querySelector(templateSelector);
+
+	    if (!element) {
+	        throw new Error('Unknown template id');
+	    }
+
+	    var template = element.innerHTML.trim();
+	    var fakeContainer = document.createElement('div');
+
+	    fakeContainer.innerHTML = template;
+
+	    var templateDOM = fakeContainer.childNodes;
+	    var templateDOMLength = templateDOM.length;
+
+	    if (templateDOMLength > 1) {
+	        var fragment = document.createDocumentFragment();
+	        for (var i = 0; i < templateDOMLength; i++) {
+	            fragment.appendChild(templateDOM[i]);
+	        }
+
+	        templateDOM = fragment;
+	    } else {
+	        templateDOM = templateDOM[0];
+	    }
+
+	    return templateDOM;
+	}
+
+	module.exports = simpleTemplate;
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var inputNickname = __webpack_require__(6);
+	var inputNickname = __webpack_require__(8);
 
 	function addNicknameActions(socket) {
 	    socket.on('nickname was asked', function () {
@@ -179,7 +226,7 @@
 	module.exports = addNicknameActions;
 
 /***/ },
-/* 6 */
+/* 8 */
 /***/ function(module, exports) {
 
 	module.exports = function (socket, duplicateNickname) {
@@ -194,7 +241,7 @@
 	};
 
 /***/ },
-/* 7 */
+/* 9 */
 /***/ function(module, exports) {
 
 	function addNicknameLogs(socket, logger) {
@@ -214,7 +261,7 @@
 	module.exports = addNicknameLogs;
 
 /***/ },
-/* 8 */
+/* 10 */
 /***/ function(module, exports) {
 
 	function addUsersLogs(socket, logger) {
@@ -230,7 +277,7 @@
 	module.exports = addUsersLogs;
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports) {
 
 	function addOwnClientLogs(socket, logger) {
