@@ -1,4 +1,4 @@
-var networkLogger = require('./network_logger');
+var networkLogger = require('./shared_instances/network_logger');
 var addNicknameActions = require('./listeners_actions/nickname');
 var addNicknameLogs = require('./listeners_reports/nickname');
 var addUsersLogs = require('./listeners_reports/users');
