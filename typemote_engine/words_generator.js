@@ -17,5 +17,4 @@ WordsGenerator.prototype.generate = function () {
     return words.slice(0, this.wordCountPerGeneration);
 };
 
-
-module.exports = WordsGenerator();
+module.exports = WordsGenerator;
