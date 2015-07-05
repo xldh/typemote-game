@@ -90,8 +90,13 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var Logger = __webpack_require__(4);
+	var LogHTMLDisplayer = __webpack_require__(5);
+	var displayer = new LogHTMLDisplayer({
+	    container: document.getElementById('network_logger'),
+	    templateSelector: '#logger_inner_contents'
+	});
 
-	module.exports = new Logger();
+	module.exports = new Logger(displayer);
 
 /***/ },
 /* 4 */
