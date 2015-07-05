@@ -21,6 +21,7 @@ body {
     float: left;
     background-color: #f6f6f6;
     padding-left: 1%;
+    overflow: auto;
 }
 
 #game_canvas {
