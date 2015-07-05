@@ -28,7 +28,7 @@ describe('WordsGenerator', function() {
             wordGeneratorWithoutLimit = new WordsGenerator({
                 words: words
             });
-        })
+        });
 
         it('should return an array of word list size', function () {
             assert.equal(
