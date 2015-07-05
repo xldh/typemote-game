@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Typemote</title>
+    <link rel="stylesheet" href="styles/main.css" type="text/css" />
 </head>
 <body>
-    <div id="network_logger"></div>
+    <div id="main_container">
+        <div id="network_logger" class="gray_box_shadow"></div>
+        <canvas id="game_canvas" class="gray_box_shadow"></canvas>
+    </div>
     <script type="text/html" id="logger_inner_contents">
         <p data-contents></p>
     </script>

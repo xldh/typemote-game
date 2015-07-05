@@ -1,0 +1,37 @@
+html {
+    height: 100%;
+}
+
+body {
+    min-height: 100%;
+    padding: 0;
+    margin: 0 auto;
+    font-family: georgia;
+    font-size: 1.2em;
+}
+
+#main_container {
+    width: 100%;
+    height: 100%;
+}
+
+#network_logger {
+    width: 19%;
+    height: 100vh;
+    float: left;
+    background-color: #f6f6f6;
+    padding-left: 1%;
+}
+
+#game_canvas {
+    width: 79%;
+    float: left;
+}
+
+.gray_box_shadow {
+    -moz-box-shadow: 5px 5px 5px 0px #cfcfcf;
+    -webkit-box-shadow: 5px 5px 5px 0px #cfcfcf;
+    -o-box-shadow: 5px 5px 5px 0px #cfcfcf;
+    box-shadow: 5px 5px 5px 0px #cfcfcf;
+    filter:progid:DXImageTransform.Microsoft.Shadow(color=#cfcfcf, Direction=134, Strength=5);
+}
