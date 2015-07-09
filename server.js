@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var server = app.listen(process.env.PORT, process.env.IP);
 var io = require('socket.io')(server);
+var fs = require('fs');
 var eventBus = require('./shared_instances/event_bus');
 
 app.use('/', express.static('public'));
@@ -17,6 +18,11 @@ io.on('connection', function (socket) {
 
     socket.on('nickname was input', function (nickname) {
         tryToRememberSocketNickname(socket, nickname);
+    });
+
+    socket.on('game chosen', function (gameName) {
+        console.log('game chosen', gameName);
+        tryToSelectGame(socket, gameName);
     });
 
     socket.on('disconnect', function () {
@@ -67,11 +73,24 @@ function makeSocketAwareOfOthers(socket) {
     }
 }
 
+
+function tryToSelectGame(socket, gameName) {
+    var availableGames = getAvailableGames();
+    var gameIndex = availableGames.indexOf(gameName);
+
+    if (gameIndex !== -1) {
+        socket.emit('you chose game', gameName, getGameWords(gameName));
+    } else {
+        socket.emit('your game choice was rejected', gameName, availableGames);
+    }
+}
+
+
 function addServerLocalListeners() {
     eventBus.on('nickname accepted', function (socket, nickname) {
         var availableGames = getAvailableGames();
 
-        console.log('nickname accepted', availableGames);
+        console.log('nickname accepted', nickname);
         console.log('asking client to choose a game');
 
         socket.emit('nickname accepted', nickname);
@@ -81,8 +100,13 @@ function addServerLocalListeners() {
 
 
 function getAvailableGames() {
-    var fs = require('fs');
     var games = fs.readdirSync('./games');
 
     return games;
+}
+
+function getGameWords(gameName) {
+    var gameWords = require('./games/' + gameName + '/words');
+
+    return gameWords;
 }
