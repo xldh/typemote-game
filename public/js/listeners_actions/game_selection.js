@@ -2,7 +2,11 @@ var eventBus = require('../shared_instances/event_bus');
 
 function addGameActions(socket) {
     socket.on('choose a game', function (gameNames) {
-        promptGameChoice(socket, gameNames);
+        if (socket.gameName) {
+            socket.emit('game chosen', socket.gameName);
+        } else {
+            promptGameChoice(socket, gameNames);
+        }
     });
 
     socket.on('your game choice was rejected', function (gameName, gameNames) {
@@ -10,6 +14,7 @@ function addGameActions(socket) {
     });
 
     socket.on('you chose game', function (name, words) {
+        setSocketGameName(socket, name);
         eventBus.emit('please init game ' + name, words);
     });
 }
@@ -20,6 +25,10 @@ function promptGameChoice(socket, gameNames) {
     }).join('\n'));
 
     socket.emit('game chosen', gameNames[gameNumber - 1]);
+}
+
+function setSocketGameName(socket, gameName) {
+    socket.gameName = gameName;
 }
 
 module.exports = addGameActions;
