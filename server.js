@@ -33,6 +33,10 @@ io.on('connection', function (socket) {
         }
     });
 
+    socket.on('word was input', function (word) {
+        console.log('client sent word', word);
+    });
+
     makeSocketAwareOfOthers(socket);
     socket.emit('nickname was asked');
 });
