@@ -6,6 +6,7 @@ var addUsersLogs = require('./listeners_reports/users');
 var addOwnClientLogs = require('./listeners_reports/own_client');
 var addGameSelectionLogs = require('./listeners_reports/game_selection');
 
+
 module.exports = function (socket) {
     // actions
     addNicknameActions(socket);

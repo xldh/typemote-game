@@ -1,4 +1,5 @@
 var eventBus = require('../shared_instances/event_bus');
+var playGame = require('../core/play_game');
 
 function addGameActions(socket) {
     socket.on('choose a game', function (gameNames) {
@@ -16,6 +17,7 @@ function addGameActions(socket) {
     socket.on('you chose game', function (name, words) {
         setSocketGameName(socket, name);
         eventBus.emit('please init game ' + name, words);
+        eventBus.emit('requiring to play game', name, words);
     });
 }
 
