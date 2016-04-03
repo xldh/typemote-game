@@ -683,7 +683,8 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var eventBus = __webpack_require__(11);
-	var render = __webpack_require__(22);
+	var context2d = __webpack_require__(25);
+	var Drawer = __webpack_require__(26);
 
 	eventBus.on('please init game the_walk', function (words) {
 	    console.log('"The walk" game init was asked politely', words);
@@ -695,12 +696,20 @@
 	    }
 
 	    this.hero = {
+	        width: 0.1,
+	        height: 0.1,
 	        x: 0,
 	        y: 0
 	    };
 
+	    this.hero.x = 0.1;
+	    this.hero.y = 0.1;
+	    this.drawer = new Drawer(context2d);
+
+
 	    Game.instance = this;
 	}
+
 
 	Game.instance = null;
 
@@ -709,13 +718,22 @@
 
 	    window.requestAnimationFrame(function () {
 	        game.update();
+	        game.render();
+	        game.run();
 	    });
 	};
 
-	Game.prototype.update = function () {
-	    var game = Game.instance;
-	    window.requestAnimationFrame(game.update);
+
+	Game.prototype.render = function () {
+	    this.drawer.clear();
+	    this.drawer.drawRect(this.hero);
 	};
+
+
+	Game.prototype.update = function () {
+	    this.hero.x += 0.0001;
+	};
+
 
 	module.exports = Game;
 
@@ -723,15 +741,7 @@
 /* 19 */,
 /* 20 */,
 /* 21 */,
-/* 22 */
-/***/ function(module, exports) {
-
-	function render(game) {
-	}
-
-	module.exports = render;
-
-/***/ },
+/* 22 */,
 /* 23 */,
 /* 24 */
 /***/ function(module, exports, __webpack_require__) {
@@ -747,6 +757,74 @@
 	    console.log('play game', game);
 	    game.run();
 	}
+
+/***/ },
+/* 25 */
+/***/ function(module, exports) {
+
+	var canvas = document.getElementById('game_canvas');
+	var context2d = canvas.getContext('2d');
+
+	canvas.width = 800;
+	canvas.height = 600;
+
+	function provideContext() {
+	    return context2d;
+	}
+
+	module.exports = context2d;
+
+/***/ },
+/* 26 */
+/***/ function(module, exports) {
+
+	function Drawer(context2D) {
+	    this.ctx = context2D;
+	}
+
+	Drawer.prototype.drawRect = function (params) {
+	    params = params || {};
+	    var color = params.color || '#000000';
+	    var width = params.width;
+	    var height = params.height;
+	    var x = params.x;
+	    var y = params.y;
+	    var canvasScreenCoordinates = this.toPixels(x, y);
+
+	    this.ctx.save();
+	    this.ctx.fillStyle = color;
+	    this.ctx.fillRect(
+	        canvasScreenCoordinates.x,
+	        canvasScreenCoordinates.y,
+	        width * this.ctx.canvas.width,
+	        height * this.ctx.canvas.height
+	    );
+	    this.ctx.restore();
+	}
+
+
+	Drawer.prototype.clear = function () {
+	    this.drawRect({
+	        x: 0,
+	        y: 0,
+	        width: this.ctx.canvas.width,
+	        height: this.ctx.canvas.height,
+	        color: '#FFFFFF'
+	    })
+	};
+
+	Drawer.prototype.toPixels = function (x, y) {
+	    var width = this.ctx.canvas.width;
+	    var height = this.ctx.canvas.height;
+
+	    return {
+	        x: width * x,
+	        y: height * y
+	    };
+	};
+
+
+	module.exports = Drawer;
 
 /***/ }
 /******/ ]);
