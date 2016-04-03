@@ -45,23 +45,31 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	// preload available games
-	var availableGames = __webpack_require__(16);
-	var initSocket = __webpack_require__(1);
+	var availableGames = __webpack_require__(1);
+	var initSocket = __webpack_require__(2);
 	var socket = initSocket();
 
 	preloadAvailableGames();
 
 	function preloadAvailableGames() {
 	    availableGames.forEach(function (game) {
-	        __webpack_require__(23)("./" + game + '/index');
+	        __webpack_require__(17)("./" + game + '/index');
 	    });
 	}
 
 /***/ },
 /* 1 */
+/***/ function(module, exports) {
+
+	var availableGames = ['the_walk'];
+
+	module.exports = availableGames;
+
+/***/ },
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var initSocketListeners = __webpack_require__(2);
+	var initSocketListeners = __webpack_require__(3);
 	var socket = null;
 
 	function initSocket() {
@@ -76,35 +84,36 @@
 	module.exports = initSocket;
 
 /***/ },
-/* 2 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var networkLogger = __webpack_require__(3);
-	var addNicknameActions = __webpack_require__(7);
-	var addGameActions = __webpack_require__(9);
-	var addNicknameLogs = __webpack_require__(12);
-	var addUsersLogs = __webpack_require__(13);
-	var addOwnClientLogs = __webpack_require__(14);
-	var addGameLogs = __webpack_require__(15);
+	var networkLogger = __webpack_require__(4);
+	var addNicknameActions = __webpack_require__(8);
+	var addGameSelectionActions = __webpack_require__(10);
+	var addNicknameLogs = __webpack_require__(13);
+	var addUsersLogs = __webpack_require__(14);
+	var addOwnClientLogs = __webpack_require__(15);
+	var addGameSelectionLogs = __webpack_require__(16);
+
 
 	module.exports = function (socket) {
 	    // actions
 	    addNicknameActions(socket);
-	    addGameActions(socket);
+	    addGameSelectionActions(socket);
 
 	    // logs
 	    addNicknameLogs(socket, networkLogger);
-	    addGameLogs(socket, networkLogger);
+	    addGameSelectionLogs(socket, networkLogger);
 	    addUsersLogs(socket, networkLogger);
 	    addOwnClientLogs(socket, networkLogger);
 	};
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Logger = __webpack_require__(4);
-	var LogHTMLDisplayer = __webpack_require__(5);
+	var Logger = __webpack_require__(5);
+	var LogHTMLDisplayer = __webpack_require__(6);
 	var displayer = new LogHTMLDisplayer({
 	    container: document.getElementById('network_logger'),
 	    templateSelector: '#logger_inner_contents'
@@ -113,10 +122,10 @@
 	module.exports = new Logger(displayer);
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var LogHTMLDisplayer = __webpack_require__(5);
+	var LogHTMLDisplayer = __webpack_require__(6);
 
 	function Logger(displayer) {
 	    this.buffer = [];
@@ -146,10 +155,10 @@
 	module.exports = Logger;
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var simpleTemplate = __webpack_require__(6);
+	var simpleTemplate = __webpack_require__(7);
 
 	function LogHTMLDisplayer(params) {
 	    params = params || {};
@@ -183,7 +192,7 @@
 	module.exports = LogHTMLDisplayer;
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports) {
 
 	function simpleTemplate(templateSelector) {
@@ -218,10 +227,10 @@
 	module.exports = simpleTemplate;
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var inputNickname = __webpack_require__(8);
+	var inputNickname = __webpack_require__(9);
 
 	function addNicknameActions(socket) {
 	    socket.on('nickname was asked', function () {
@@ -245,7 +254,7 @@
 	module.exports = addNicknameActions;
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	module.exports = function (socket, duplicateNickname) {
@@ -260,14 +269,19 @@
 	};
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var eventBus = __webpack_require__(10);
+	var eventBus = __webpack_require__(11);
+	var playGame = __webpack_require__(24);
 
 	function addGameActions(socket) {
 	    socket.on('choose a game', function (gameNames) {
-	        promptGameChoice(socket, gameNames);
+	        if (socket.gameName) {
+	            socket.emit('game chosen', socket.gameName);
+	        } else {
+	            promptGameChoice(socket, gameNames);
+	        }
 	    });
 
 	    socket.on('your game choice was rejected', function (gameName, gameNames) {
@@ -275,7 +289,9 @@
 	    });
 
 	    socket.on('you chose game', function (name, words) {
+	        setSocketGameName(socket, name);
 	        eventBus.emit('please init game ' + name, words);
+	        eventBus.emit('requiring to play game', name, words);
 	    });
 	}
 
@@ -287,18 +303,22 @@
 	    socket.emit('game chosen', gameNames[gameNumber - 1]);
 	}
 
+	function setSocketGameName(socket, gameName) {
+	    socket.gameName = gameName;
+	}
+
 	module.exports = addGameActions;
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var EventEmitter = __webpack_require__(11);
+	var EventEmitter = __webpack_require__(12);
 
 	module.exports = new EventEmitter();
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -566,7 +586,7 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 	function addNicknameLogs(socket, logger) {
@@ -586,7 +606,7 @@
 	module.exports = addNicknameLogs;
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 	function addUsersLogs(socket, logger) {
@@ -602,7 +622,7 @@
 	module.exports = addUsersLogs;
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports) {
 
 	function addOwnClientLogs(socket, logger) {
@@ -614,7 +634,7 @@
 	module.exports = addOwnClientLogs;
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports) {
 
 	function addGameLogs(socket, logger) {
@@ -638,36 +658,11 @@
 	module.exports = addGameLogs;
 
 /***/ },
-/* 16 */
-/***/ function(module, exports) {
-
-	var availableGames = ['the_walk'];
-
-	module.exports = availableGames;
-
-/***/ },
-/* 17 */,
-/* 18 */,
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var eventBus = __webpack_require__(10);
-
-	eventBus.on('please init game the_walk', function (words) {
-	    console.log('"The walk" game init was asked politely', words);
-	});
-
-	module.exports = true;
-
-/***/ },
-/* 20 */,
-/* 21 */,
-/* 22 */,
-/* 23 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var map = {
-		"./the_walk/index": 19
+		"./the_walk/index": 18
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -680,8 +675,78 @@
 	};
 	webpackContext.resolve = webpackContextResolve;
 	module.exports = webpackContext;
-	webpackContext.id = 23;
+	webpackContext.id = 17;
 
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var eventBus = __webpack_require__(11);
+	var render = __webpack_require__(22);
+
+	eventBus.on('please init game the_walk', function (words) {
+	    console.log('"The walk" game init was asked politely', words);
+	});
+
+	function Game(words) {
+	    if (Game.instance) {
+	        return Game.instance;
+	    }
+
+	    this.hero = {
+	        x: 0,
+	        y: 0
+	    };
+
+	    Game.instance = this;
+	}
+
+	Game.instance = null;
+
+	Game.prototype.run = function () {
+	    var game = this;
+
+	    window.requestAnimationFrame(function () {
+	        game.update();
+	    });
+	};
+
+	Game.prototype.update = function () {
+	    var game = Game.instance;
+	    window.requestAnimationFrame(game.update);
+	};
+
+	module.exports = Game;
+
+/***/ },
+/* 19 */,
+/* 20 */,
+/* 21 */,
+/* 22 */
+/***/ function(module, exports) {
+
+	function render(game) {
+	}
+
+	module.exports = render;
+
+/***/ },
+/* 23 */,
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var eventBus = __webpack_require__(11);
+
+	eventBus.on('requiring to play game', playGame);
+
+	function playGame(name, words) {
+	    console.log('playGame', name, words);
+	    var Game = __webpack_require__(17)("./" + name + '/index');
+	    var game = new Game(words);
+	    console.log('play game', game);
+	    game.run();
+	}
 
 /***/ }
 /******/ ]);
