@@ -1,18 +1,24 @@
 var matchWords = require('./match_words');
 var WordsGenerator = require('./words_generator');
+var mapWordsToActions = require('./map_words_to_actions');
 
 function WordsEngine(params) {
     params = params || {};
 
     var wordPool = params.words || [];
     var poolSize = params.poolSize || wordPool.length;
+    var actions = params.actions || {};
 
     this.wordsGenerator = new WordsGenerator({
         words: wordPool,
         wordCountPerGeneration: poolSize
     });
 
-    this.words = this.wordsGenerator.generate();
+    var words = this.wordsGenerator.generate();
+
+    this.mappedWordsActions = mapWordsToActions(words, actions);
+    this.words = words;
+    this.actions = actions;
 }
 
 /**
@@ -39,6 +45,19 @@ WordsEngine.prototype.bestMatchingWord = function (word) {
     });
 
     return matches[0];
+};
+
+
+WordsEngine.prototype.findActionFromWord = function (word) {
+    for (var actionName in this.mappedWordsActions) {
+        console.log(actionName, this.mappedWordsActions[actionName]);
+
+        if (word === this.mappedWordsActions[actionName]) {
+            return this.actions[actionName];
+        }
+    }
+
+    return null;
 };
 
 WordsEngine.prototype.nextWordGenereration = function () {

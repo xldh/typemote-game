@@ -7,6 +7,7 @@ function WordsGenerator(params) {
 
     this.words = words;
     this.wordCountPerGeneration = wordCountPerGeneration;
+    this.lastGeneration = [];
 }
 
 
@@ -14,7 +15,11 @@ WordsGenerator.prototype.generate = function () {
     var words = this.words.slice();
     shuffle(words);
 
-    return words.slice(0, this.wordCountPerGeneration);
+    var generation = words.slice(0, this.wordCountPerGeneration);
+
+    this.lastGeneration = generation;
+
+    return generation;
 };
 
 module.exports = WordsGenerator;

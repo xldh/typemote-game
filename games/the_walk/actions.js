@@ -17,3 +17,10 @@ function down(state) {
     state.down = true;
     state.up = false;
 }
+
+module.exports = {
+    right: right,
+    left: left,
+    up: up,
+    down: down
+};

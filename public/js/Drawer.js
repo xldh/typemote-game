@@ -20,7 +20,24 @@ Drawer.prototype.drawRect = function (params) {
         height * this.ctx.canvas.height
     );
     this.ctx.restore();
-}
+};
+
+Drawer.prototype.drawText = function (params) {
+    params = params || {};
+
+    if (!params.text) {
+        return;
+    }
+
+    var color = params.color || '#000000';
+    var text = params.text;
+    var x = params.x * this.ctx.canvas.width || 0;
+    var y = params.y * this.ctx.canvas.height || 0;
+
+    this.ctx.save();
+    this.ctx.fillStyle = color;
+    this.ctx.fillText(text, x, y);
+};
 
 
 Drawer.prototype.clear = function () {

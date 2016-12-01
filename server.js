@@ -5,6 +5,8 @@ var io = require('socket.io')(server);
 var fs = require('fs');
 var eventBus = require('./shared_instances/event_bus');
 
+var WordsEngine = require('./typemote_engine/words_engine');
+
 app.use('/', express.static('public'));
 
 var nicknames = {};
@@ -31,10 +33,6 @@ io.on('connection', function (socket) {
         if (socket.nickname) {
             delete nicknames[socket.nickname];
         }
-    });
-
-    socket.on('word was input', function (word) {
-        console.log('client sent word', word);
     });
 
     makeSocketAwareOfOthers(socket);
@@ -80,13 +78,50 @@ function makeSocketAwareOfOthers(socket) {
 
 function tryToSelectGame(socket, gameName) {
     var availableGames = getAvailableGames();
-    var gameIndex = availableGames.indexOf(gameName);
+    var gameIndex = availableGames.map(function (game) {
+        return game.id;
+    }).indexOf(gameName);
 
     if (gameIndex !== -1) {
-        socket.emit('you chose game', gameName, getGameWords(gameName));
+        var newGameInstance = getGameData(gameName).init(socket);
+
+        runGame(socket, newGameInstance);
+
+        newGameInstance.wordsEngine = new WordsEngine({
+            words: getGameWords(gameName),
+            actions: getGameActions(gameName)
+        });
+
+        socket.emit('you chose game', gameName, newGameInstance.wordsEngine.mappedWordsActions, newGameInstance.states);
     } else {
         socket.emit('your game choice was rejected', gameName, availableGames);
     }
+}
+
+
+function runGame(socket, game) {
+
+
+    socket.on('word was input', function (word) {
+        console.log('client sent word', word);
+
+        var bestMatchingWord = game.wordsEngine.bestMatchingWord(word);
+        var action = game.wordsEngine.findActionFromWord(word);
+
+        if (action) {
+            console.log('Action found!', game.states);
+            action(game.states);
+        }
+    });
+
+    function update () {
+        game.update(game.states);
+        setTimeout(function () {
+            setImmediate(update);
+        }, 100);
+    }
+
+    update();
 }
 
 
@@ -104,13 +139,30 @@ function addServerLocalListeners() {
 
 
 function getAvailableGames() {
-    var games = fs.readdirSync('./games');
+    var dirs = fs.readdirSync('./games');
 
-    return games;
+    return dirs.map(function (dir) {
+        return {
+            id: dir,
+            name: require('./games/' + dir).name
+        };
+    });
+}
+
+function getGameData(gameName) {
+    var gameData = require('./games/' + gameName + '/index');
+
+    return gameData;
 }
 
 function getGameWords(gameName) {
     var gameWords = require('./games/' + gameName + '/words');
 
     return gameWords;
+}
+
+function getGameActions(gameName) {
+    var gameActions = require('./games/' + gameName + '/actions');
+
+    return gameActions;
 }

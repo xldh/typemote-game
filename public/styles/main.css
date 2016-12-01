@@ -21,11 +21,13 @@ body {
     float: left;
     background-color: #f6f6f6;
     padding-left: 1%;
+    padding-right: 1%;
+    margin-right: 1%;
     overflow: auto;
 }
 
 #game_canvas {
-    width: 79%;
+    width: 78%;
     float: left;
 }
 

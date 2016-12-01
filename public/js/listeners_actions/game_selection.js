@@ -2,11 +2,11 @@ var eventBus = require('../shared_instances/event_bus');
 var playGame = require('../core/play_game');
 
 function addGameActions(socket) {
-    socket.on('choose a game', function (gameNames) {
+    socket.on('choose a game', function (games) {
         if (socket.gameName) {
             socket.emit('game chosen', socket.gameName);
         } else {
-            promptGameChoice(socket, gameNames);
+            promptGameChoice(socket, games);
         }
     });
 
@@ -14,19 +14,20 @@ function addGameActions(socket) {
         promptGameChoice(socket, gameNames);
     });
 
-    socket.on('you chose game', function (name, words) {
+    socket.on('you chose game', function (name, words, gameData) {
         setSocketGameName(socket, name);
-        eventBus.emit('please init game ' + name, words);
-        eventBus.emit('requiring to play game', name, words);
+        eventBus.emit('please init game ' + name, words, gameData);
+        eventBus.emit('requiring to play game', name, words, gameData);
     });
 }
 
-function promptGameChoice(socket, gameNames) {
-    var gameNumber = prompt(gameNames.map(function (gameName, index) {
-        return (index + 1) + ': ' + gameName;
+function promptGameChoice(socket, games) {
+    var gameNumber = prompt(games.map(function (game, index) {
+        console.log('gameName', game.name);
+        return game.name + ' (' + (index + 1) + ')';
     }).join('\n'));
 
-    socket.emit('game chosen', gameNames[gameNumber - 1]);
+    socket.emit('game chosen', games[gameNumber - 1].id);
 }
 
 function setSocketGameName(socket, gameName) {
