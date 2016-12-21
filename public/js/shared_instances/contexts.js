@@ -1,11 +1,14 @@
 var gameCanvas = document.getElementById('game_canvas');
 var uiCanvas = document.getElementById('ui_canvas');
+var effectsCanvas = document.getElementById('effects_canvas');
 var gameContext = gameCanvas.getContext('2d');
 var uiContext = uiCanvas.getContext('2d');
+var effectsContext = effectsCanvas.getContext('2d');
 
 var canvases = [
     gameCanvas,
-    uiCanvas
+    uiCanvas,
+    effectsCanvas
 ];
 
 setup();
@@ -21,5 +24,6 @@ function setup() {
 
 module.exports = {
     gameContext: gameContext,
-    uiContext: uiContext
+    uiContext: uiContext,
+    effectsContext: effectsContext
 };

@@ -3,6 +3,7 @@ var contexts = require('../../shared_instances/contexts');
 var Drawer = require('../../Drawer');
 var gameContext = contexts.gameContext;
 var uiContext = contexts.uiContext;
+var effectsContext = contexts.effectsContext;
 
 eventBus.on('please init game the_walk', function (actionsWords) {
     console.log('"The walk" game init was asked politely', actionsWords);
@@ -24,6 +25,7 @@ function Game(actionsWords, states) {
 
     this.gameDrawer = new Drawer(gameContext);
     this.uiDrawer = new Drawer(uiContext);
+    this.effectsDrawer = new Drawer(effectsContext);
     this.actionsWords = actionsWords;
     this.states = states;
 
@@ -49,6 +51,19 @@ Game.prototype.run = function () {
         }
 
         game.run();
+    });
+};
+
+
+// @TODO add some sexiness to the effect, it's pretty boring right now
+Game.prototype.renderCharTyped = function (char) {
+    this.effectsDrawer.clear();
+    this.effectsDrawer.drawText({
+        text: char,
+        x: 0.5,
+        y: 0.6,
+        color: 'rgba(0, 0, 0, 0.3)',
+        font: '80pt georgia'
     });
 };
 
