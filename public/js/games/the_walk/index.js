@@ -59,7 +59,7 @@ Game.prototype.renderGame = function () {
         y: this.hero.y,
         width: this.hero.width,
         height: this.hero.height,
-        color: 'rgba(255, 0, 0, 0.01)',
+        color: 'rgba(0, 0, 0, 0.01)',
     };
 
     this.gameDrawer.drawRect(params);

@@ -8,11 +8,13 @@ var canvases = [
     uiCanvas
 ];
 
+setup();
+
 
 function setup() {
     canvases.forEach(function (canvas) {
-        canvas.width = 1900;
-        canvas.height = 1080;
+        canvas.width = 600;
+        canvas.height = 400;
     });
 }
 

@@ -773,7 +773,7 @@
 	        y: this.hero.y,
 	        width: this.hero.width,
 	        height: this.hero.height,
-	        color: 'rgba(255, 0, 0, 0.01)',
+	        color: 'rgba(0, 0, 0, 0.01)',
 	    };
 
 	    this.gameDrawer.drawRect(params);
@@ -833,11 +833,13 @@
 	    uiCanvas
 	];
 
+	setup();
+
 
 	function setup() {
 	    canvases.forEach(function (canvas) {
-	        canvas.width = 1900;
-	        canvas.height = 1080;
+	        canvas.width = 600;
+	        canvas.height = 400;
 	    });
 	}
 
