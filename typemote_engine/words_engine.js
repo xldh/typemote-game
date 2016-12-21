@@ -14,11 +14,8 @@ function WordsEngine(params) {
         wordCountPerGeneration: poolSize
     });
 
-    var words = this.wordsGenerator.generate();
-
-    this.mappedWordsActions = mapWordsToActions(words, actions);
-    this.words = words;
     this.actions = actions;
+    this.nextWordGeneration();
 }
 
 /**
@@ -60,8 +57,9 @@ WordsEngine.prototype.findActionFromWord = function (word) {
     return null;
 };
 
-WordsEngine.prototype.nextWordGenereration = function () {
-    this.words = this.wordGenerator.generate();
+WordsEngine.prototype.nextWordGeneration = function () {
+    this.words = this.wordsGenerator.generate();
+    this.mappedWordsActions = mapWordsToActions(this.words, this.actions);
 };
 
 module.exports = WordsEngine;
