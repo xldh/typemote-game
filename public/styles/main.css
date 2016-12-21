@@ -26,10 +26,17 @@ body {
     overflow: auto;
 }
 
-#game_canvas {
-    width: 78%;
+#canvas_layers {
+    position: relative;
+    width: 70%;
     float: left;
 }
+
+#canvas_layers canvas {
+    position: absolute;
+    width: 100%;
+}
+
 
 .gray_box_shadow {
     -moz-box-shadow: 5px 5px 5px 0px #cfcfcf;

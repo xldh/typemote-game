@@ -29,7 +29,7 @@ function initGame(socket) {
                 states.position.y += 0.001;
             }
 
-            socket.emit('update', states);
+            socket.emit('states update', states);
         },
         actions: actions,
         states: states

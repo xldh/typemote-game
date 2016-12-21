@@ -12,4 +12,10 @@ function playGame(name, words, gameData) {
     eventBus.on('states update', function (states) {
         game.states = states;
     });
+
+    eventBus.on('words update', function (actionsWords) {
+        console.log('words update', actionsWords);
+        game.actionsWords = actionsWords;
+        game.uiNeedsRedraw = true;
+    });
 }

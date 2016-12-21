@@ -2,6 +2,7 @@ function Drawer(context2D) {
     this.ctx = context2D;
 }
 
+
 Drawer.prototype.drawRect = function (params) {
     params = params || {};
     var color = params.color || '#000000';
@@ -41,13 +42,18 @@ Drawer.prototype.drawText = function (params) {
 
 
 Drawer.prototype.clear = function () {
-    this.drawRect({
-        x: 0,
-        y: 0,
-        width: this.ctx.canvas.width,
-        height: this.ctx.canvas.height,
-        color: '#FFFFFF'
-    })
+    var width = this.ctx.canvas.width;
+    var height = this.ctx.canvas.height;
+    var x = 0;
+    var y = 0;
+    var canvasScreenCoordinates = this.toPixels(x, y);
+
+    this.ctx.clearRect(
+        canvasScreenCoordinates.x,
+        canvasScreenCoordinates.y,
+        width * this.ctx.canvas.width,
+        height * this.ctx.canvas.height
+    );
 };
 
 Drawer.prototype.toPixels = function (x, y) {

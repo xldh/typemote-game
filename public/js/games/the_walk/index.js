@@ -1,6 +1,8 @@
 var eventBus = require('../../shared_instances/event_bus');
-var context2d = require('../../shared_instances/context2d');
+var contexts = require('../../shared_instances/contexts');
 var Drawer = require('../../Drawer');
+var gameContext = contexts.gameContext;
+var uiContext = contexts.uiContext;
 
 eventBus.on('please init game the_walk', function (actionsWords) {
     console.log('"The walk" game init was asked politely', actionsWords);
@@ -20,9 +22,12 @@ function Game(actionsWords, states) {
         y: states.position.y
     };
 
-    this.drawer = new Drawer(context2d);
+    this.gameDrawer = new Drawer(gameContext);
+    this.uiDrawer = new Drawer(uiContext);
     this.actionsWords = actionsWords;
     this.states = states;
+
+    this.uiNeedsRedraw = true;
 
     Game.instance = this;
 }
@@ -35,16 +40,29 @@ Game.prototype.run = function () {
 
     window.requestAnimationFrame(function () {
         game.update();
-        game.render();
+        game.renderGame();
+
+        if (game.uiNeedsRedraw) {
+            console.log('redrawing ui');
+            game.renderActions();
+            game.uiNeedsRedraw = false;
+        }
+
         game.run();
     });
 };
 
 
-Game.prototype.render = function () {
-    this.drawer.clear();
-    this.drawer.drawRect(this.hero);
-    this.renderActions();
+Game.prototype.renderGame = function () {
+    var params = {
+        x: this.hero.x,
+        y: this.hero.y,
+        width: this.hero.width,
+        height: this.hero.height,
+        color: 'rgba(255, 0, 0, 0.01)',
+    };
+
+    this.gameDrawer.drawRect(params);
 };
 
 
@@ -54,22 +72,23 @@ Game.prototype.findWordForAction = function (actionName) {
 
 
 Game.prototype.renderActions = function () {
-    this.drawer.drawText({
+    this.uiDrawer.clear();
+    this.uiDrawer.drawText({
         text: this.findWordForAction('left'),
         x: 0.1,
         y: 0.5
     });
-    this.drawer.drawText({
+    this.uiDrawer.drawText({
         text: this.findWordForAction('up'),
         x: 0.5,
         y: 0.1
     });
-    this.drawer.drawText({
+    this.uiDrawer.drawText({
         text: this.findWordForAction('right'),
         x: 0.9,
         y: 0.5
     });
-    this.drawer.drawText({
+    this.uiDrawer.drawText({
         text: this.findWordForAction('down'),
         x: 0.5,
         y: 0.9

@@ -8,7 +8,10 @@
 <body>
     <div id="main_container">
         <div id="network_logger" class="gray_box_shadow"></div>
-        <canvas id="game_canvas" class="gray_box_shadow"></canvas>
+        <div id="canvas_layers" class="gray_box_shadow">
+            <canvas id="game_canvas"></canvas>
+            <canvas id="ui_canvas"></canvas>
+        </div>
     </div>
     <script type="text/html" id="logger_inner_contents">
         <p data-contents></p>
