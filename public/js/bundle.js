@@ -668,6 +668,7 @@
 
 	eventBus.on('requiring to play game', playGame);
 
+	// @TODO decouple game mechanics and effects mechanics as they are different
 	function playGame(name, words, gameData) {
 	    console.log('playGame', name, words);
 	    var Game = __webpack_require__(14)("./" + name + '/index');
@@ -677,6 +678,11 @@
 
 	    eventBus.on('states update', function (states) {
 	        game.states = states;
+	    });
+
+	    eventBus.on('char was typed', function (char) {
+	        console.log('renderCharTyped', char);
+	        game.renderCharTyped(char);
 	    });
 
 	    eventBus.on('words update', function (actionsWords) {
@@ -717,6 +723,7 @@
 	var Drawer = __webpack_require__(17);
 	var gameContext = contexts.gameContext;
 	var uiContext = contexts.uiContext;
+	var effectsContext = contexts.effectsContext;
 
 	eventBus.on('please init game the_walk', function (actionsWords) {
 	    console.log('"The walk" game init was asked politely', actionsWords);
@@ -738,6 +745,7 @@
 
 	    this.gameDrawer = new Drawer(gameContext);
 	    this.uiDrawer = new Drawer(uiContext);
+	    this.effectsDrawer = new Drawer(effectsContext);
 	    this.actionsWords = actionsWords;
 	    this.states = states;
 
@@ -763,6 +771,19 @@
 	        }
 
 	        game.run();
+	    });
+	};
+
+
+	// @TODO add some sexiness to the effect, it's pretty boring right now
+	Game.prototype.renderCharTyped = function (char) {
+	    this.effectsDrawer.clear();
+	    this.effectsDrawer.drawText({
+	        text: char,
+	        x: 0.5,
+	        y: 0.6,
+	        color: 'rgba(0, 0, 0, 0.3)',
+	        font: '80pt georgia'
 	    });
 	};
 
@@ -825,12 +846,15 @@
 
 	var gameCanvas = document.getElementById('game_canvas');
 	var uiCanvas = document.getElementById('ui_canvas');
+	var effectsCanvas = document.getElementById('effects_canvas');
 	var gameContext = gameCanvas.getContext('2d');
 	var uiContext = uiCanvas.getContext('2d');
+	var effectsContext = effectsCanvas.getContext('2d');
 
 	var canvases = [
 	    gameCanvas,
-	    uiCanvas
+	    uiCanvas,
+	    effectsCanvas
 	];
 
 	setup();
@@ -846,7 +870,8 @@
 
 	module.exports = {
 	    gameContext: gameContext,
-	    uiContext: uiContext
+	    uiContext: uiContext,
+	    effectsContext: effectsContext
 	};
 
 
@@ -891,9 +916,20 @@
 	    var x = params.x * this.ctx.canvas.width || 0;
 	    var y = params.y * this.ctx.canvas.height || 0;
 
+	    // @TODO allow a fontSize param that would be computed into font
+	    var font = params.font;
+
 	    this.ctx.save();
+
+	    if (font !== undefined) {
+	        this.ctx.font = font;
+	    }
+
 	    this.ctx.fillStyle = color;
+	    this.ctx.textAlign = 'center';
+
 	    this.ctx.fillText(text, x, y);
+	    this.ctx.restore();
 	};
 
 
