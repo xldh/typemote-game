@@ -111,6 +111,8 @@ function runGame(socket, game) {
         if (action) {
             console.log('Action found!', game.states);
             action(game.states);
+            game.wordsEngine.nextWordGeneration();
+            socket.emit('words update', game.wordsEngine.mappedWordsActions);
         }
     });
 
