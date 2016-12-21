@@ -35,9 +35,20 @@ Drawer.prototype.drawText = function (params) {
     var x = params.x * this.ctx.canvas.width || 0;
     var y = params.y * this.ctx.canvas.height || 0;
 
+    // @TODO allow a fontSize param that would be computed into font
+    var font = params.font;
+
     this.ctx.save();
+
+    if (font !== undefined) {
+        this.ctx.font = font;
+    }
+
     this.ctx.fillStyle = color;
+    this.ctx.textAlign = 'center';
+
     this.ctx.fillText(text, x, y);
+    this.ctx.restore();
 };
 
 
