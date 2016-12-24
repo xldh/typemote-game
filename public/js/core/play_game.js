@@ -15,8 +15,11 @@ function playGame(name, words, gameData) {
     });
 
     eventBus.on('char was typed', function (char) {
-        console.log('renderCharTyped', char);
         game.renderCharTyped(char);
+    });
+
+    eventBus.on('end of word was typed', function () {
+        game.clearEffects();
     });
 
     eventBus.on('words update', function (actionsWords) {

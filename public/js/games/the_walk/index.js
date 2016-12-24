@@ -55,16 +55,34 @@ Game.prototype.run = function () {
 };
 
 
-// @TODO add some sexiness to the effect, it's pretty boring right now
-Game.prototype.renderCharTyped = function (char) {
+// @TODO maybe add some particles when typing? For now it'll do anyways
+Game.prototype.renderCharTyped = function (char, opacity) {
+    var game = this;
+    if (opacity === undefined) {
+        opacity = 1;
+    }
+
+    function fadeOutStep() {
+        game.effectsDrawer.clear();
+        game.effectsDrawer.drawText({
+            text: char,
+            x: 0.5,
+            y: 0.6,
+            color: 'rgba(0, 0, 0,' + opacity + ')',
+            font: '80pt georgia'
+        });
+
+        if (opacity > 0) {
+            game.renderCharTyped(char, opacity * 0.75);
+        }
+    }
+
+    requestAnimationFrame(fadeOutStep);
+};
+
+
+Game.prototype.clearEffects = function () {
     this.effectsDrawer.clear();
-    this.effectsDrawer.drawText({
-        text: char,
-        x: 0.5,
-        y: 0.6,
-        color: 'rgba(0, 0, 0, 0.3)',
-        font: '80pt georgia'
-    });
 };
 
 
